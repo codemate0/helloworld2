@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy static site to Azure Web App - helloworld2-manas
+name: Build and deploy ASP.Net Core app to Azure Web App - helloworld2-manas
 
 on:
   push:
@@ -18,11 +18,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: .
+          path: ${{env.DOTNET_ROOT}}/myapp
 
   deploy:
     runs-on: windows-latest
@@ -36,13 +47,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-
+      
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F54A1A7B59D148D0813D168C493D2D23 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_4360725F97CA41329BD7FE035BCC3C83 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_FB98B69F287C44B7B1BAE27F9D1579B3 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_60067FFE1958420DA1CC23CFE59FCD8C }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_E7D9A69627014E4A8BE5DB5957BA25EF }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_AB32266A8E7F40269155B269631F6043 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -51,3 +62,4 @@ jobs:
           app-name: 'helloworld2-manas'
           slot-name: 'Production'
           package: .
+          
